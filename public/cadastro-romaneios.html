@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CADASTRO ROMANEIOS</title>
+    <script defer src="/__/firebase/9.6.6/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.6.6/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+  </head>
+  <body>
+
+    <h2>ROMANEIO INDAIÁ</h2>
+    <h4>Registro de Romaneio de Água Mineral 20L INDAIÁ</h4>
+
+    <form method="post">
+
+        <input id="nome" type="hidden" />
+        
+        <label for="data">DATA/HORA:</label>
+        <input id="data" name="data" type="datetime-local" /><br />
+
+        <label for="placa">PLACA VEÍCULO:</label>
+        <select id="placa" name="placa">
+        <option id="hyd" value="HYD-2A18">HYD-2A18</option>
+        <option id="jvw" value="JVW-7464">JVW-7464</option>
+        </select> <br />
+
+        <label for="itemA">(A) BOM PARA ENVASE:</label>
+        <input id="itemA" name="A" type="number" min="0" /><br />
+
+        <label for="itemB">(B) RETORNO VAZIO:</label>
+        <input id="itemB" name="B" type="number" min="0" /><br />
+
+        <label for="itemC">(C) ENTRADA CHEIO:</label>
+        <input id="itemC" name="C" type="number" min="0" /><br />
+
+        <label for="itemH">(H) TROCA (PERDA):</label>
+        <input id="itemH" name="H" type="number" min="0" /><br />
+
+        <label for="itemI">(I) CHEIO (À FATURAR):</label>
+        <input id="itemI" name="I" type="number" min="0" /><br />
+
+        <button type="button" onclick="teste()">gravar</button>
+
+    </form>
+
+    <br />
+
+    <p id="resultado"></p>
+
+    <script src="js/index.js"></script>
+
+  </body>
+</html>
