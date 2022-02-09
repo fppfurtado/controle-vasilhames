@@ -39,7 +39,7 @@
         <label for="itemI">(I) CHEIO (À FATURAR):</label>
         <input id="itemI" name="I" type="number" min="0" /><br />
 
-        <button type="button" onclick="teste()">gravar</button>
+        <button type="button" onclick="gravarRomaneio()">gravar</button>
 
     </form>
 
@@ -48,6 +48,28 @@
     <p id="resultado"></p>
 
     <script src="js/index.js"></script>
+
+    <script>
+
+      function gravarRomaneio() {
+
+        const romaneio = {
+          data: new Date(document.getElementById("data").value),
+          placa: document.getElementById("placa").value,
+          itemA: eval(document.getElementById("itemA").value),
+          itemB: eval(document.getElementById("itemB").value),
+          itemC: eval(document.getElementById("itemC").value),
+          itemH: eval(document.getElementById("itemH").value),
+          itemI: eval(document.getElementById("itemI").value)
+        }
+
+        //console.log(romaneio);
+        
+        salvarDocumento("romaneios", romaneio);
+
+      }
+
+    </script>
 
   </body>
 </html>
