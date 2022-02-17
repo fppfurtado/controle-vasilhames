@@ -56,16 +56,30 @@
         const romaneio = {
           data: new Date(document.getElementById("data").value),
           placa: document.getElementById("placa").value,
-          itemA: eval(document.getElementById("itemA").value),
-          itemB: eval(document.getElementById("itemB").value),
-          itemC: eval(document.getElementById("itemC").value),
-          itemH: eval(document.getElementById("itemH").value),
-          itemI: eval(document.getElementById("itemI").value)
+          itemA: document.getElementById("itemA").value,
+          itemB: document.getElementById("itemB").value,
+          itemC: document.getElementById("itemC").value,
+          itemH: document.getElementById("itemH").value,
+          itemI: document.getElementById("itemI").value
         }
 
-        //console.log(romaneio);
+        id = Date.parse(romaneio.data)
+          .toString()
+          .slice(0,6)
+          .concat(romaneio.placa.replace('-',''),
+          (!!eval(romaneio.itemA)
+          + !!eval(romaneio.itemB)
+          + !!eval(romaneio.itemC)
+          + !!eval(romaneio.itemH)
+          + !!eval(romaneio.itemI)));
+
+        console.log(id);
+       //verificarDuplicidadeRomaneio(romaneio, id);
+       //if (verificarDuplicidadeRomaneio(romaneio)) {
+        salvarDocumento("romaneios", romaneio, id);
+       //}
         
-        salvarDocumento("romaneios", romaneio);
+        
 
       }
 
