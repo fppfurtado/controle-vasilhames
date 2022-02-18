@@ -46,9 +46,19 @@
                     let linha = tabela.insertRow();
                     let celData = linha.insertCell();
                     let celPlaca = linha.insertCell();
+                    let celItemA = linha.insertCell();
+                    let celItemB = linha.insertCell();
+                    let celItemC = linha.insertCell();
+                    let celItemH = linha.insertCell();
+                    let celItemI = linha.insertCell();
                     
                     celData.innerHTML = formatarData(romaneio.data);
                     celPlaca.innerHTML = romaneio.placa;
+                    celItemA.innerHTML = romaneio.itemA;
+                    celItemB.innerHTML = romaneio.itemB;
+                    celItemC.innerHTML = romaneio.itemC;
+                    celItemH.innerHTML = romaneio.itemH;
+                    celItemI.innerHTML = romaneio.itemI;
 
                 })
             })
