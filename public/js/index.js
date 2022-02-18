@@ -49,20 +49,20 @@ function salvarDocumento(colecao, documento, id) {
     
 }
 
-function verificarDuplicidadeRomaneio(documento, id) {
-    
-    firebase.firestore().collection("romaneios").doc(id)
-    .get()
-    .then((documentSnapshot) => {
-        // querySnapshot.forEach((doc) => {
-        //     // doc.data() is never undefined for query doc snapshots
-        //     console.log(doc.id, " => ", doc.data());
-        // });
-        console.log(documentSnapshot);
-    })
-    .catch((error) => {
-        console.log("Error getting documents: ", error);
-    });
+function formatarData(data) {
 
+    let epochTimestamp = data.seconds + "000";
+    let dataJS = new Date(eval(epochTimestamp));
+    let dia = dataJS.getDate();
+    let mes = formatarMes(dataJS.getMonth()+1);
+    let ano = dataJS.getFullYear();
+
+    return dia  + "/" + mes + "/" + ano;    
+
+}
+
+function formatarMes(mes) {
+
+    return mes < 10 ? "0" + mes : mes;
 
 }
