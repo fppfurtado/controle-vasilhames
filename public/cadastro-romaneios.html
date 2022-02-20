@@ -13,7 +13,7 @@
 
     <form method="post">
 
-        <input id="nome" type="hidden" />
+        <input id="id" type="hidden" />
         
         <label for="data">DATA/HORA:</label>
         <input id="data" name="data" type="datetime-local" /><br />
@@ -53,33 +53,51 @@
 
       function gravarRomaneio() {
 
-        const romaneio = {
-          data: new Date(document.getElementById("data").value),
-          placa: document.getElementById("placa").value,
-          itemA: document.getElementById("itemA").value,
-          itemB: document.getElementById("itemB").value,
-          itemC: document.getElementById("itemC").value,
-          itemH: document.getElementById("itemH").value,
-          itemI: document.getElementById("itemI").value
+        let id = document.getElementById("id").value;
+
+        if(!!id) {
+          
+          atualizarDocumento(colecao, id);
+
+        } else {
+
+          const romaneio = {
+            data: new Date(document.getElementById("data").value),
+            placa: document.getElementById("placa").value,
+            itemA: document.getElementById("itemA").value,
+            itemB: document.getElementById("itemB").value,
+            itemC: document.getElementById("itemC").value,
+            itemH: document.getElementById("itemH").value,
+            itemI: document.getElementById("itemI").value
+          }
+
+          salvarDocumento("romaneios", romaneio, gerarIdRomaneio());
+
         }
 
-        id = Date.parse(romaneio.data)
+       // console.log(id);
+
+      }
+
+      function gerarIdRomaneio() {
+
+        let data = document.getElementById("data").value;
+        let placa = document.getElementById("placa").value;
+        let itemA = document.getElementById("itemA").value;
+        let itemB = document.getElementById("itemB").value;
+        let itemC = document.getElementById("itemC").value;
+        let itemH = document.getElementById("itemH").value;
+        let itemI = document.getElementById("itemI").value;
+
+        return Date.parse(data)
           .toString()
           .slice(0,6)
-          .concat(romaneio.placa.replace('-',''),
-          (!!eval(romaneio.itemA)
-          + !!eval(romaneio.itemB)
-          + !!eval(romaneio.itemC)
-          + !!eval(romaneio.itemH)
-          + !!eval(romaneio.itemI)));
-
-        console.log(id);
-       //verificarDuplicidadeRomaneio(romaneio, id);
-       //if (verificarDuplicidadeRomaneio(romaneio)) {
-        salvarDocumento("romaneios", romaneio, id);
-       //}
-        
-        
+          .concat(placa.replace('-',''),
+          (!!eval(itemA)
+          + !!eval(itemB)
+          + !!eval(itemC)
+          + !!eval(itemH)
+          + !!eval(itemI)));
 
       }
 
