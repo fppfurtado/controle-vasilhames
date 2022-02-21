@@ -16,7 +16,7 @@
         <input id="id" type="hidden" />
         
         <label for="data">DATA/HORA:</label>
-        <input id="data" name="data" type="datetime-local" /><br />
+        <input id="data" name="data" type="date" /><br />
 
         <label for="placa">PLACA VEÍCULO:</label>
         <select id="placa" name="placa">
@@ -51,25 +51,54 @@
 
     <script>
 
-      function gravarRomaneio() {
+      let id = null;
 
-        let id = document.getElementById("id").value;
+      document.addEventListener("DOMContentLoaded", function() {
+        id = getUrlParameter("id");
 
         if(!!id) {
-          
-          atualizarDocumento(colecao, id);
+          console.log("id: "+id);
+          carregarDocumentos("romaneios", id)
+          .then((documentSnapshot) => {
+
+            let romaneio = documentSnapshot.data();
+
+            document.getElementById("id").value = id;
+            document.getElementById("data").value = formatarData(romaneio.data, "us");
+            document.getElementById("placa").value = romaneio.placa;
+            document.getElementById("itemA").value = romaneio.itemA;
+            document.getElementById("itemB").value = romaneio.itemB;
+            document.getElementById("itemC").value = romaneio.itemC;
+            document.getElementById("itemH").value = romaneio.itemH;
+            document.getElementById("itemI").value = romaneio.itemI;
+
+          })
+          .catch((error) => {
+            console.log("Erro no carregamento de documento: "+ error);
+          });
+
+        }
+
+      })
+
+      function gravarRomaneio() {
+
+        const romaneio = {
+          data: new Date(document.getElementById("data").value),
+          placa: document.getElementById("placa").value,
+          itemA: document.getElementById("itemA").value,
+          itemB: document.getElementById("itemB").value,
+          itemC: document.getElementById("itemC").value,
+          itemH: document.getElementById("itemH").value,
+          itemI: document.getElementById("itemI").value
+        }
+
+        if(!!id) {
+
+          romaneio.id = id;
+          atualizarDocumento("romaneios", romaneio);
 
         } else {
-
-          const romaneio = {
-            data: new Date(document.getElementById("data").value),
-            placa: document.getElementById("placa").value,
-            itemA: document.getElementById("itemA").value,
-            itemB: document.getElementById("itemB").value,
-            itemC: document.getElementById("itemC").value,
-            itemH: document.getElementById("itemH").value,
-            itemI: document.getElementById("itemI").value
-          }
 
           salvarDocumento("romaneios", romaneio, gerarIdRomaneio());
 
