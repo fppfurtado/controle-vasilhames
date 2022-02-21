@@ -1,31 +1,6 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     var docRef = firebase.firestore().collection("teste").doc("cZ494FOwMgDBuwNRFHeg");
-
-//     docRef.get().then((doc) => {
-//         if (doc.exists) {
-//             console.log("Document data:", doc.data());
-//         } else {
-//             // doc.data() will be undefined in this case
-//             console.log("No such document!");
-//         }
-//     }).catch((error) => {
-//         console.log("Error getting document:", error);
-//     });
-
-//   });
-
-//const db = firebase.firestore();
 
 function salvarDocumento(colecao, documento, id) {
 
-    // firebase.firestore().collection(colecao).doc(id).set(documento)
-    // .then((docRef) => {
-    //     console.log("Document written with ID: ", id);
-    // })
-    // .catch((error) => {
-    //     console.error("Error adding document: ", error);
-    // });
-    
     firebase.firestore().collection(colecao).doc(id)
     .get()
     .then((documentSnapshot) => {
@@ -49,20 +24,72 @@ function salvarDocumento(colecao, documento, id) {
     
 }
 
-function formatarData(data) {
+function formatarData(data, formato = "br") {
 
     let epochTimestamp = data.seconds + "000";
     let dataJS = new Date(eval(epochTimestamp));
-    let dia = dataJS.getDate();
-    let mes = formatarMes(dataJS.getMonth()+1);
+    //let dia = formatarZeroAEsquerda(dataJS.getDate());
+    let dia = String(dataJS.getDate()).padStart(2, "0");
+    //let mes = formatarZeroAEsquerda(dataJS.getMonth()+1);
+    let mes = String(dataJS.getMonth()+1).padStart(2, "0");
     let ano = dataJS.getFullYear();
 
-    return dia  + "/" + mes + "/" + ano;    
+    return formato == "br" ? dia  + "/" + mes + "/" + ano : ano + "-" + mes + "-" + dia;    
 
 }
 
-function formatarMes(mes) {
+function carregarDocumentos(colecao, id) {
 
-    return mes < 10 ? "0" + mes : mes;
+    return new Promise((resolve, reject) => {
+
+        let colecaoRef = firebase.firestore().collection(colecao);
+
+        if(!!id) {
+
+            colecaoRef.doc(id).get()
+            .then((documentSnapshot) => {
+                console.log(documentSnapshot);
+                resolve(documentSnapshot);
+            })
+            .catch((error) => {
+                reject(error);
+            })
+
+        } else{
+
+            colecaoRef.get()
+            .then((querySnapshot) => {
+                console.log(querySnapshot);
+                resolve(querySnapshot);
+            })
+            .catch((error) => {
+                reject(error);
+            })
+
+        }
+
+    });
+
+    
 
 }
+
+function atualizarDocumento(colecao, id) {
+    console.log("atualizando documento...");
+}
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
