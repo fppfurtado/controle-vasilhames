@@ -54,6 +54,7 @@
       let id = null;
 
       document.addEventListener("DOMContentLoaded", function() {
+
         id = getUrlParameter("id");
 
         if(!!id) {
@@ -100,7 +101,7 @@
 
         } else {
 
-          salvarDocumento("romaneios", romaneio, gerarIdRomaneio());
+          criarDocumento("romaneios", romaneio, gerarIdRomaneio());
 
         }
 

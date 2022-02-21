@@ -1,5 +1,5 @@
 
-function salvarDocumento(colecao, documento, id) {
+function criarDocumento(colecao, documento, id) {
 
     firebase.firestore().collection(colecao).doc(id)
     .get()
