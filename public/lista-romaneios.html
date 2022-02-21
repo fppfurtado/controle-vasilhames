@@ -34,12 +34,13 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            firebase.firestore().collection("romaneios").get()
+            carregarDocumentos("romaneios", null)
             .then((querySnapshot) => {
-                //console.log(querySnapshot);
+
+                console.log(querySnapshot);
                 querySnapshot.forEach((doc) => {
 
-                    console.log(doc.data());
+                    console.log(doc.id);
 
                     let romaneio = doc.data();
                     let tabela = document.getElementById("tabela");
@@ -51,6 +52,7 @@
                     let celItemC = linha.insertCell();
                     let celItemH = linha.insertCell();
                     let celItemI = linha.insertCell();
+                    let celAcao = linha.insertCell();
                     
                     celData.innerHTML = formatarData(romaneio.data);
                     celPlaca.innerHTML = romaneio.placa;
@@ -59,12 +61,19 @@
                     celItemC.innerHTML = romaneio.itemC;
                     celItemH.innerHTML = romaneio.itemH;
                     celItemI.innerHTML = romaneio.itemI;
+                    
+                    linkAcao = document.createElement("a");
+                    linkAcao.setAttribute("href", "cadastro-romaneios.html?id=" + doc.id);
+                    linkAcao.textContent = "editar";
+
+                    celAcao.appendChild(linkAcao);
 
                 })
+
             })
             .catch((error) => {
-                console.log("Error getting documents: "+error);
-            })
+                console.log("Error iterating documents: "+error);
+            })           
 
         });
 
