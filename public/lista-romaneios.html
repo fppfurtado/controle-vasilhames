@@ -53,6 +53,7 @@
                     let celItemH = linha.insertCell();
                     let celItemI = linha.insertCell();
                     let celAcao = linha.insertCell();
+                    let linkEditar = document.createElement("a");
                     
                     celData.innerHTML = formatarData(romaneio.data);
                     celPlaca.innerHTML = romaneio.placa;
@@ -62,11 +63,10 @@
                     celItemH.innerHTML = romaneio.itemH;
                     celItemI.innerHTML = romaneio.itemI;
                     
-                    linkAcao = document.createElement("a");
-                    linkAcao.setAttribute("href", "cadastro-romaneios.html?id=" + doc.id);
-                    linkAcao.textContent = "editar";
-
-                    celAcao.appendChild(linkAcao);
+                    linkEditar.setAttribute("href", "cadastro-romaneios.html?id=" + doc.id);
+                    linkEditar.textContent = "editar";
+                    
+                    celAcao.appendChild(linkEditar);
 
                 })
 
