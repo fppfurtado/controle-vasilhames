@@ -70,12 +70,28 @@ function carregarDocumentos(colecao, id) {
 
     });
 
-    
+}
+
+function atualizarDocumento(colecao, documento) {
+
+    console.log("atualizando documento...");
+    firebase.firestore().collection(colecao).doc(documento.id).set(documento)
+            .then((docRef) => {
+                console.log("Document written with ID: ", id);
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+            });
 
 }
 
-function atualizarDocumento(colecao, id) {
-    console.log("atualizando documento...");
+function excluirDocumento(colecao, id) {
+    firebase.firestore().collection(colecao).doc(id).delete().then(() => {
+        console.log("Document successfully deleted!");
+        window.location.assign("lista-romaneios.html");
+    }).catch((error) => {
+        console.error("Error removing document: ", error);
+    });
 }
 
 var getUrlParameter = function getUrlParameter(sParam) {
