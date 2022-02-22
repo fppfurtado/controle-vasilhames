@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CADASTRO ENTREGAS</title>
+    <script defer src="/__/firebase/9.6.6/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.6.6/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+</head>
+<body>
+    
+    <h2>ENTREGAS</h2>
+    <h4>Cadastro de Entregas</h4>
+
+    <form method="post">
+
+        <input id="id" type="hidden" />
+        
+        <label for="data">DATA:</label>
+        <input id="data" name="data" type="date" /><br />
+
+        <label for="destino">DESTINO:</label>
+        <input id="destino" name="destino" type="text" />
+        <a onclick="cadastrar-destino()">+</a><br />
+
+        <label for="qtdGarrafoes">QTD GARRAFÕES</label>
+        <input id="qtdGarrafoes" name="qtdGarrafoes" type="number" min="1" /><br />
+
+        <button type="button" onclick="gravarEntrega()">gravar</button>
+        <button type="button" onclick="excluirEntrega()">excluir</button>
+
+    </form>
+
+    <br />
+
+    <script src="js/index.js"></script>
+
+</body>
+</html>
