@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISTA ENTREGAS</title>
+    <script defer src="/__/firebase/9.6.6/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.6.6/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+</head>
+<body>
+    
+    <table id="tabela">
+        <thead>
+            <tr>
+                <th>data</th>
+                <th>destino</th>
+                <th>qtd garrafoes</th>
+                <th>ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+    <script src="js/index.js"></script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            carregarDocumentos("entregas")
+            .then((querySnapshot) => {
+
+                //console.log(querySnapshot);
+                querySnapshot.forEach((doc) => {
+
+                    console.log(doc.id);
+
+                    let entrega = doc.data();
+                    let tabela = document.getElementById("tabela");
+                    let linha = tabela.insertRow();
+                    let celData = linha.insertCell();
+                    let celDestino = linha.insertCell();
+                    let celQtdGarrafoes = linha.insertCell();
+                    let celAcao = linha.insertCell();
+                    let linkEditar = document.createElement("a");
+                    
+                    celData.innerHTML = formatarData(entrega.data);
+                    celDestino.innerHTML = entrega.destino;
+                    celQtdGarrafoes.innerHTML = entrega.qtdGarrafoes;
+                    
+                    linkEditar.setAttribute("href", "cadastro-entregas.html?id=" + doc.id);
+                    linkEditar.textContent = "editar";
+                    
+                    celAcao.appendChild(linkEditar);
+
+                })
+
+            })
+            .catch((error) => {
+                console.log("Error iterating documents: "+error);
+            })           
+
+        });
+
+    </script>
+
+
+</body>
+</html>
