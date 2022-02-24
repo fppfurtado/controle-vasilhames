@@ -1,26 +1,40 @@
 
-function criarDocumento(colecao, documento, id) {
+function criarDocumento(colecao, documento, id = null) {
 
-    firebase.firestore().collection(colecao).doc(id)
-    .get()
-    .then((documentSnapshot) => {
-        console.log(documentSnapshot);
-        if(!documentSnapshot.exists) {
-            firebase.firestore().collection(colecao).doc(id).set(documento)
-            .then((docRef) => {
-                console.log("Document written with ID: ", id);
+    if(!!id) {
+
+        firebase.firestore().collection(colecao).doc(id)
+            .get()
+            .then((documentSnapshot) => {
+                console.log(documentSnapshot);
+                if(!documentSnapshot.exists) {
+                    firebase.firestore().collection(colecao).doc(id).set(documento)
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", id);
+                    })
+                    .catch((error) => {
+                        console.error("Error adding document: ", error);
+                    });  
+                }
+                else {
+                    alert("Registro já cadastrado");
+                }
             })
             .catch((error) => {
-                console.error("Error adding document: ", error);
-            });  
-        }
-        else {
-            alert("Registro já cadastrado");
-        }
-    })
-    .catch((error) => {
-        console.log("Error getting documents: ", error);
-    });
+                console.log("Error getting documents: ", error);
+            });
+
+    } else {
+
+        firebase.firestore().collection(colecao).add(documento)
+        .then((docRef) => {
+            console.log("documento registrado: "+docRef.id);
+        })
+        .catch((error) => {
+            console.log("erro no registro do documento: "+error);
+        })
+
+    }
     
 }
 
@@ -38,7 +52,7 @@ function formatarData(data, formato = "br") {
 
 }
 
-function carregarDocumentos(colecao, id) {
+function carregarDocumentos(colecao, id = null) {
 
     return new Promise((resolve, reject) => {
 
