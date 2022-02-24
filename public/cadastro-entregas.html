@@ -18,9 +18,9 @@
         <label for="data">DATA:</label>
         <input id="data" name="data" type="date" /><br />
 
-        <label for="destino">DESTINO:</label>
-        <input id="destino" name="destino" type="text" />
-        <a onclick="cadastrar-destino()">+</a><br />
+        <label for="local">LOCAL DESTINO:</label>
+        <select id="local" name="local">
+        </select> <br />
 
         <label for="qtdGarrafoes">QTD GARRAFÕES</label>
         <input id="qtdGarrafoes" name="qtdGarrafoes" type="number" min="1" /><br />
@@ -33,6 +33,83 @@
     <br />
 
     <script src="js/index.js"></script>
+
+    <script>
+
+        let id = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            carregarLocais();
+
+            id = getUrlParameter("id");
+
+            if(!!id) {
+                //console.log("id: "+id);
+                carregarEntrega();
+
+            }
+
+        })
+
+        function gravarEntrega() {
+
+            const entrega = {
+                data: new Date(document.getElementById("data").value),
+                local: document.getElementById("local").value,
+                qtdGarrafoes: document.getElementById("qtdGarrafoes").value,
+            }
+
+            criarDocumento("entregas", entrega);
+            
+        }
+
+        function carregarEntrega() {
+
+            carregarDocumentos("entregas", id)
+            .then((documentSnapshot) => {
+
+                let entrega = documentSnapshot.data();
+
+                document.getElementById("id").value = id;
+                document.getElementById("data").value = formatarData(entrega.data, "us");
+                document.getElementById("destino").value = entrega.destino;
+                document.getElementById("qtdGarrafoes").value = entrega.qtdGarrafoes;
+            
+            })
+            .catch((error) => {
+                console.log("Erro no carregamento de documento: "+ error);
+            });
+            
+        }
+
+        function carregarLocais() {
+
+            carregarDocumentos("locais")
+            .then((querySnapshot) => {
+
+                let select = document.getElementById("local");                    
+
+                querySnapshot.forEach((docRef) => {
+
+                    let local = docRef.data();
+                    let option = document.createElement("option");
+
+                    option.setAttribute("value", local.nome);
+                    option.text = local.nome;
+
+                    select.add(option);
+
+                })
+            
+            })
+            .catch((error) => {
+                console.log("Erro no carregamento de locais: "+ error);
+            });
+
+        }
+
+    </script>
 
 </body>
 </html>
