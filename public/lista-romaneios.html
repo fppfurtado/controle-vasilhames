@@ -34,10 +34,10 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            carregarDocumentos("romaneios", null)
+            carregarDocumentos("romaneios")
             .then((querySnapshot) => {
 
-                console.log(querySnapshot);
+                //console.log(querySnapshot);
                 querySnapshot.forEach((doc) => {
 
                     console.log(doc.id);
