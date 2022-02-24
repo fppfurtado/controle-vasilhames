@@ -59,25 +59,8 @@
         id = getUrlParameter("id");
 
         if(!!id) {
-          console.log("id: "+id);
-          carregarDocumentos("romaneios", id)
-          .then((documentSnapshot) => {
-
-            let romaneio = documentSnapshot.data();
-
-            document.getElementById("id").value = id;
-            document.getElementById("data").value = formatarData(romaneio.data, "us");
-            document.getElementById("placa").value = romaneio.placa;
-            document.getElementById("itemA").value = romaneio.itemA;
-            document.getElementById("itemB").value = romaneio.itemB;
-            document.getElementById("itemC").value = romaneio.itemC;
-            document.getElementById("itemH").value = romaneio.itemH;
-            document.getElementById("itemI").value = romaneio.itemI;
-
-          })
-          .catch((error) => {
-            console.log("Erro no carregamento de documento: "+ error);
-          });
+          
+          carregarRomaneio();
 
         }
 
@@ -105,6 +88,30 @@
           criarDocumento("romaneios", romaneio, gerarIdRomaneio());
 
         }
+
+      }
+
+      function carregarRomaneio() {
+
+        //console.log("id: "+id);
+        carregarDocumentos("romaneios", id)
+          .then((documentSnapshot) => {
+
+            let romaneio = documentSnapshot.data();
+
+            document.getElementById("id").value = id;
+            document.getElementById("data").value = formatarData(romaneio.data, "us");
+            document.getElementById("placa").value = romaneio.placa;
+            document.getElementById("itemA").value = romaneio.itemA;
+            document.getElementById("itemB").value = romaneio.itemB;
+            document.getElementById("itemC").value = romaneio.itemC;
+            document.getElementById("itemH").value = romaneio.itemH;
+            document.getElementById("itemI").value = romaneio.itemI;
+
+          })
+          .catch((error) => {
+            console.log("Erro no carregamento de documento: "+ error);
+          });
 
       }
 
