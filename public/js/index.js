@@ -1,6 +1,8 @@
 
 function criarDocumento(colecao, documento, id = null) {
 
+    console.log("[CRIAR DOCUMENTO]");
+
     if(!!id) {
 
         firebase.firestore().collection(colecao).doc(id)
@@ -40,6 +42,8 @@ function criarDocumento(colecao, documento, id = null) {
 
 function formatarData(data, formato = "br") {
 
+    console.log("[FORMATAR DATA]");
+
     let epochTimestamp = data.seconds + "000";
     let dataJS = new Date(eval(epochTimestamp));
     //let dia = formatarZeroAEsquerda(dataJS.getDate());
@@ -48,11 +52,17 @@ function formatarData(data, formato = "br") {
     let mes = String(dataJS.getMonth()+1).padStart(2, "0");
     let ano = dataJS.getFullYear();
 
-    return formato == "br" ? dia  + "/" + mes + "/" + ano : ano + "-" + mes + "-" + dia;    
+    let dataFormatada = formato == "br" ? dia  + "/" + mes + "/" + ano : ano + "-" + mes + "-" + dia; 
+
+    console.log(dataFormatada);
+
+    return dataFormatada;
 
 }
 
 function carregarDocumentos(colecao, id = null) {
+
+    console.log("[CARREGAR DOCUMENTOS]");
 
     return new Promise((resolve, reject) => {
 
@@ -86,12 +96,14 @@ function carregarDocumentos(colecao, id = null) {
 
 }
 
-function atualizarDocumento(colecao, documento) {
+function atualizarDocumento(colecao, documento, id) {
 
-    console.log("atualizando documento...");
-    firebase.firestore().collection(colecao).doc(documento.id).set(documento)
+    console.log("[ATUALIZAR DOCUMENTO]");
+
+    console.log("atualizando documento: "+ id);
+    firebase.firestore().collection(colecao).doc(id).set(documento)
             .then((docRef) => {
-                console.log("Document written with ID: ", id);
+                console.log("Document written with ID: ", docRef);
             })
             .catch((error) => {
                 console.error("Error adding document: ", error);
@@ -100,6 +112,9 @@ function atualizarDocumento(colecao, documento) {
 }
 
 function excluirDocumento(colecao, id) {
+
+    console.log("[EXCLUIR DOCUMENTO]");
+
     firebase.firestore().collection(colecao).doc(id).delete().then(() => {
         console.log("Document successfully deleted!");
         window.location.assign("lista-romaneios.html");
@@ -108,7 +123,10 @@ function excluirDocumento(colecao, id) {
     });
 }
 
-var getUrlParameter = function getUrlParameter(sParam) {
+function getUrlParameter(sParam) {
+
+    console.log("[GET URL PARAMENTER]");
+
     var sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('&'),
         sParameterName,
