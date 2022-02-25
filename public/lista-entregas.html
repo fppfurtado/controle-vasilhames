@@ -49,7 +49,7 @@
                     let linkEditar = document.createElement("a");
                     
                     celData.innerHTML = formatarData(entrega.data);
-                    celDestino.innerHTML = entrega.destino;
+                    celDestino.innerHTML = entrega.local;
                     celQtdGarrafoes.innerHTML = entrega.qtdGarrafoes;
                     
                     linkEditar.setAttribute("href", "cadastro-entregas.html?id=" + doc.id);
