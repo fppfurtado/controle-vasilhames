@@ -60,8 +60,12 @@
                 qtdGarrafoes: document.getElementById("qtdGarrafoes").value,
             }
 
-            criarDocumento("entregas", entrega);
-            
+            if(!!id) {
+                atualizarDocumento("entregas", entrega, id);
+            } else {
+                criarDocumento("entregas", entrega);            
+            }
+
         }
 
         function carregarEntrega() {
