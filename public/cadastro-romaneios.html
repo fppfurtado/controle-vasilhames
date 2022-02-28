@@ -16,7 +16,7 @@
         <input id="id" type="hidden" />
         
         <label for="data">DATA/HORA:</label>
-        <input id="data" name="data" type="date" /><br />
+        <input id="data" name="data" type="datetime-local" /><br />
 
         <label for="placa">PLACA VEÍCULO:</label>
         <select id="placa" name="placa">
@@ -78,6 +78,8 @@
           itemI: document.getElementById("itemI").value
         }
 
+        console.log("romaneio.data = "+romaneio.data);
+
         if(!!id) {
 
           romaneio.id = id;
@@ -85,7 +87,8 @@
 
         } else {
 
-          criarDocumento("romaneios", romaneio, gerarIdRomaneio());
+          romaneio.id = gerarIdRomaneio();
+          criarDocumento("romaneios", romaneio);
 
         }
 
