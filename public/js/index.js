@@ -1,29 +1,33 @@
 
-function criarDocumento(colecao, documento, id = null) {
+function criarDocumento(colecao, documento) {
 
     console.log("[CRIAR DOCUMENTO]");
 
-    if(!!id) {
+    if(!!documento.id) {
 
-        firebase.firestore().collection(colecao).doc(id)
+        firebase.firestore().collection(colecao).doc(documento.id)
             .get()
             .then((documentSnapshot) => {
-                console.log(documentSnapshot);
-                if(!documentSnapshot.exists) {
-                    firebase.firestore().collection(colecao).doc(id).set(documento)
+
+                if(!documentSnapshot.exist) {
+                firebase.firestore().collection(colecao).doc(documento.id).set(documento)
                     .then((docRef) => {
-                        console.log("Document written with ID: ", id);
+                        console.log("Document written with ID: ", documento.id);
                     })
                     .catch((error) => {
                         console.error("Error adding document: ", error);
-                    });  
+                    });
+
+                } else {
+                    alert("Registro já cadastrado: " + documentSnapshot);
+
                 }
-                else {
-                    alert("Registro já cadastrado");
-                }
+                
             })
             .catch((error) => {
+
                 console.log("Error getting documents: ", error);
+                
             });
 
     } else {
