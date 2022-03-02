@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CADASTRO LOCAIS</title>
+    <script defer src="/__/firebase/9.6.6/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.6.6/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+</head>
+<body>
+
+    <h2>LOCAIS</h2>
+    <h4>Cadastro de Locais</h4>
+
+    <form method="post">
+
+        <input id="id" type="hidden" />
+        
+        <label for="nome">NOME:</label>
+        <input type="text" id="nome" nome="nome" />
+
+        <button type="button" onclick="gravarLocal()">gravar</button>
+        <button type="button" onclick="excluirLocal()">excluir</button>
+
+    </form>
+
+    <br />
+
+    <script src="js/index.js"></script>
+
+    <script>
+
+        let id = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            id = getUrlParameter("id");
+
+            if(!!id) {
+                //console.log("id: "+id);
+                carregarLocal();
+
+            }
+
+        })
+
+        function gravarLocal() {
+
+            const local = {
+                nome: document.getElementById("nome").value,
+                dataRegistro: firebase.firestore.FieldValue.serverTimestamp(),
+            }
+
+            if(!!id) {
+                atualizarDocumento("locais", local, id);
+            } else {
+                criarDocumento("locais", local);            
+            }
+
+        }
+
+        function carregarLocal() {
+
+            carregarDocumentos("locais", id)
+            .then((documentSnapshot) => {
+
+                let entrega = documentSnapshot.data();
+
+                document.getElementById("id").value = id;
+                document.getElementById("nome").value = formatarData(entrega.data, "us");
+                
+            
+            })
+            .catch((error) => {
+                console.log("Erro no carregamento de documento: "+ error);
+            });
+            
+        }
+
+    </script>
+    
+</body>
+</html>
