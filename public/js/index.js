@@ -1,4 +1,10 @@
 
+document.addEventListener("DOMContentLoaded", function() {
+
+    console.log("domcontentloaded");
+
+  })
+
 function criarDocumento(colecao, documento) {
 
     console.log("[CRIAR DOCUMENTO]");
@@ -51,14 +57,16 @@ function formatarData(data, formato = "br") {
     let epochTimestamp = data.seconds + "000";
     let dataJS = new Date(eval(epochTimestamp));
     //let dia = formatarZeroAEsquerda(dataJS.getDate());
-    let dia = String(dataJS.getDate()).padStart(2, "0");
-    //let mes = formatarZeroAEsquerda(dataJS.getMonth()+1);
-    let mes = String(dataJS.getMonth()+1).padStart(2, "0");
     let ano = dataJS.getFullYear();
-
-    let dataFormatada = formato == "br" ? dia  + "/" + mes + "/" + ano : ano + "-" + mes + "-" + dia; 
-
-    console.log(dataFormatada);
+    let mes = String(dataJS.getMonth()+1).padStart(2, "0");
+    let dia = String(dataJS.getDate()).padStart(2, "0");
+    let horas = dataJS.getHours();
+    let minutos = dataJS.getMinutes();
+    //let mes = formatarZeroAEsquerda(dataJS.getMonth()+1);
+    
+    let dataFormatada = formato == "br" ? 
+    dia  + "/" + mes + "/" + ano : 
+    ano + "-" + mes + "-" + dia + "T" + horas + ":" + minutos; 
 
     return dataFormatada;
 
