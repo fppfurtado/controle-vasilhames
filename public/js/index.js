@@ -1,7 +1,83 @@
+const inventario = {
+    data: new Date(),
+    qtdVasilhamesCheiosDiaAnterior: 0,
+    qtdVasilhamesVaziosDiaAnterior: 0,
+    qtdVasilhamesQuebradosDiaAnterior: 0,
+    qtdVasilhamesCheiosDiaAtual: 0,
+    qtdVasilhamesVaziosDiaAtual: 0,
+    qtdVasilhamesQuebradosDiaAtual: 0
+};
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    console.log("domcontentloaded");
+    console.log("[DOMContentLoaded]");
+
+    // consulta se já existe o inventário do dia
+    firebase.firestore().collection("inventarios")
+    .where("data", "==", new Date())
+    .get()
+    .then((querySnapshot) => {
+        
+        // se não existir...
+        if(querySnapshot.empty) {
+
+            // carrega o inventario do dia anterior...
+            carregarDocumentos("inventarios")
+            .then((querySnapshot) => {
+
+                querySnapshot.query.where("data", "==", getYesterdayDate())
+                .get()
+                .then((querySnapshot) => {
+
+                    querySnapshot.forEach((doc) => {
+
+                        let invent = doc.data();
+
+                        // copia os quantitativos do dia anterior para o inventario atual
+
+                        inventario.qtdVasilhamesCheiosDiaAnterior = 
+                            invent.qtdVasilhamesCheiosDiaAnterior + invent.qtdVasilhamesCheiosDiaAtual;
+                        
+                        inventario.qtdVasilhamesVaziosDiaAnterior = 
+                            invent.qtdVasilhamesVaziosDiaAnterior + invent.qtdVasilhamesVaziosDiaAtual;
+
+                        inventario.qtdVasilhamesQuebradosDiaAnterior = 
+                            invent.qtdVasilhamesQuebradosDiaAnterior + invent.qtdVasilhamesQuebradosDiaAnterior;
+
+                    })
+
+                })
+            })
+            .catch((error) => {
+                console.log("Error on getting inventarios: " + error);
+            })
+
+            criarDocumento("inventarios", inventario);
+
+        } else {
+
+            querySnapshot.forEach((doc) => {
+
+                let invent = doc.data();
+
+                inventario.data = invent.data;
+                inventario.qtdVasilhamesCheiosDiaAnterior = invent.qtdVasilhamesCheiosDiaAnterior;
+                inventario.qtdVasilhamesCheiosDiaAtual = invent.qtdVasilhamesCheiosDiaAtual;
+                inventario.qtdVasilhamesVaziosDiaAnterior = invent.qtdVasilhamesVaziosDiaAnterior;
+                inventario.qtdVasilhamesVaziosDiaAtual = invent.qtdVasilhamesVaziosDiaAtual;
+                inventario.qtdVasilhamesQuebradosDiaAnterior = invent.qtdVasilhamesQuebradosDiaAnterior;
+                inventario.qtdVasilhamesQuebradosDiaAtual = invent.qtdVasilhamesQuebradosDiaAtual;
+
+            })
+
+            console.log("inventario: " + inventario);
+
+        }
+
+    })
+    .catch((error) => {
+        console.log("Error on getting inventarios: "+error);
+    })
 
   })
 
@@ -72,6 +148,10 @@ function formatarData(data, formato = "br") {
 
 }
 
+function getYesterdayDate() {
+    return new Date(new Date().getTime() - 24*60*60*1000);
+}
+
 function carregarDocumentos(colecao, id = null) {
 
     console.log("[CARREGAR DOCUMENTOS]");
@@ -84,7 +164,7 @@ function carregarDocumentos(colecao, id = null) {
 
             colecaoRef.doc(id).get()
             .then((documentSnapshot) => {
-                console.log(documentSnapshot);
+                //console.log(documentSnapshot);
                 resolve(documentSnapshot);
             })
             .catch((error) => {
@@ -95,7 +175,7 @@ function carregarDocumentos(colecao, id = null) {
 
             colecaoRef.get()
             .then((querySnapshot) => {
-                console.log(querySnapshot);
+                //console.log(querySnapshot);
                 resolve(querySnapshot);
             })
             .catch((error) => {
