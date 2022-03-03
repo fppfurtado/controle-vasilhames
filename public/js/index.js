@@ -1,5 +1,4 @@
 const inventario = {
-    data: new Date(),
     qtdVasilhamesCheiosDiaAnterior: 0,
     qtdVasilhamesVaziosDiaAnterior: 0,
     qtdVasilhamesQuebradosDiaAnterior: 0,
@@ -17,21 +16,27 @@ document.addEventListener("DOMContentLoaded", function() {
     .where("data", "==", new Date())
     .get()
     .then((querySnapshot) => {
-        
+        //console.log(querySnapshot);
         // se não existir...
         if(querySnapshot.empty) {
 
+            //inventario.data = firebase.firestore.Timestamp.fromDate(new Date());
+            inventario.data = getTodayDate();
+            
             // carrega o inventario do dia anterior...
             carregarDocumentos("inventarios")
             .then((querySnapshot) => {
 
-                querySnapshot.query.where("data", "==", getYesterdayDate())
+                querySnapshot.query.where("data", "==", getLastDayDate(inventario.data))
                 .get()
                 .then((querySnapshot) => {
 
                     querySnapshot.forEach((doc) => {
 
                         let invent = doc.data();
+
+                        console.log("invent:");
+                        console.log(invent);
 
                         // copia os quantitativos do dia anterior para o inventario atual
 
@@ -44,6 +49,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         inventario.qtdVasilhamesQuebradosDiaAnterior = 
                             invent.qtdVasilhamesQuebradosDiaAnterior + invent.qtdVasilhamesQuebradosDiaAnterior;
 
+                        criarDocumento("inventarios", inventario);
+
                     })
 
                 })
@@ -51,8 +58,6 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch((error) => {
                 console.log("Error on getting inventarios: " + error);
             })
-
-            criarDocumento("inventarios", inventario);
 
         } else {
 
@@ -148,8 +153,18 @@ function formatarData(data, formato = "br") {
 
 }
 
-function getYesterdayDate() {
-    return new Date(new Date().getTime() - 24*60*60*1000);
+function getLastDayDate(date) {
+    return new Date(date.getTime() - 24*60*60*1000);
+}
+
+function getTodayDate() {
+
+    let hoje = new Date();
+    let ano = hoje.getFullYear().toString();
+    let mes = String(hoje.getMonth()+1).padStart(2, "0");
+    let dia = String(hoje.getDate()).padStart(2, "0");
+
+    return new Date(ano + "-" + mes + "-" + dia + " 00:00");
 }
 
 function carregarDocumentos(colecao, id = null) {
