@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         inventario.qtdVasilhamesQuebradosDiaAnterior = 
                             invent.qtdVasilhamesQuebradosDiaAnterior + invent.qtdVasilhamesQuebradosDiaAnterior;
 
-                        criarDocumento("inventarios", inventario);
+                        //criarDocumento("inventarios", inventario);
 
                     })
 
@@ -58,6 +58,8 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch((error) => {
                 console.log("Error on getting inventarios: " + error);
             })
+
+            criarDocumento("inventarios", inventario);
 
         } else {
 
