@@ -53,10 +53,22 @@
     <script>
 
       let id = null;
+      let dateInputValue = document.getElementById("data").value = getTodayDate().toISOString().slice(0,16);
+      const romaneio = {
+          data: null,
+          placa: "",
+          itemA: 0,
+          itemB: 0,
+          itemC: 0,
+          itemH: 0,
+          itemI: 0
+        }
 
       document.addEventListener("DOMContentLoaded", function() {
 
         id = getUrlParameter("id");
+        document.getElementById("data").value = dateInputValue;
+        carregarInventario(new Date(dateInputValue));
 
         if(!!id) {
           
@@ -68,15 +80,13 @@
 
       function gravarRomaneio() {
 
-        const romaneio = {
-          data: new Date(document.getElementById("data").value),
-          placa: document.getElementById("placa").value,
-          itemA: document.getElementById("itemA").value,
-          itemB: document.getElementById("itemB").value,
-          itemC: document.getElementById("itemC").value,
-          itemH: document.getElementById("itemH").value,
-          itemI: document.getElementById("itemI").value
-        }
+        romaneio.data = new Date(document.getElementById("data").value);
+        romaneio.placa = document.getElementById("placa").value;
+        romaneio.itemA = document.getElementById("itemA").value;
+        romaneio.itemB = document.getElementById("itemB").value;
+        romaneio.itemC = document.getElementById("itemC").value;
+        romaneio.itemH = document.getElementById("itemH").value;
+        romaneio.itemI = document.getElementById("itemI").value;
 
         if(!!id) {
 
@@ -89,6 +99,8 @@
           criarDocumento("romaneios", romaneio);
 
         }
+
+        registrarMovimento(romaneio.id, "e");
 
       }
 
@@ -119,6 +131,7 @@
       function excluirRomaneio() {
 
         excluirDocumento("romaneios", id);
+        registrarMovimento(id, "s");
 
       }
 
@@ -141,6 +154,67 @@
           + !!eval(itemC)
           + !!eval(itemH)
           + !!eval(itemI)));
+
+      }
+
+      function registrarMovimento(romaneioId, tipoMovimento) {
+
+        let movimento = {
+          data: romaneio.data,
+          origem: romaneioId,
+          destino: romaneio.placa
+        }
+
+        if(tipoMovimento == "e") {
+
+          // vasilhames cheios
+          if(romaneio.itemI) {
+            movimento.situacaoVasilhame = "c";
+            movimento.qtdVasilhames = romaneio.itemI;
+            criarDocumento("movimentos", movimento);
+          }
+
+          // vasilhames vazios
+          if(romaneio.itemB) {            
+            movimento.situacaoVasilhame = "v";
+            movimento.qtdVasilhames = romaneio.itemB;
+            criarDocumento("movimentos", movimento);
+          }
+
+          // vasilhames inutilizados (quebrados ou vencidos)
+          if(romaneio.itemH) {            
+            movimento.situacaoVasilhame = "i";
+            movimento.qtdVasilhames = romaneio.itemH;
+            criarDocumento("movimentos", movimento);
+          }
+
+        } else {
+
+          // vasilhames cheios
+          if(romaneio.itemI) {
+            movimento.situacaoVasilhame = "c";
+            movimento.qtdVasilhames = -(romaneio.itemI);
+            criarDocumento("movimentos", movimento);
+          }
+
+          // vasilhames vazios
+          if(romaneio.itemB) {            
+            movimento.situacaoVasilhame = "v";
+            movimento.qtdVasilhames = -(romaneio.itemB);
+            criarDocumento("movimentos", movimento);
+          }
+
+          // vasilhames inutilizados (quebrados ou vencidos)
+          if(romaneio.itemH) {            
+            movimento.situacaoVasilhame = "i";
+            movimento.qtdVasilhames = -(romaneio.itemH);
+            criarDocumento("movimentos", movimento);
+          }
+
+        }
+
+        
+        atualizarInventario(romaneio.itemI, romaneio.itemB, romaneio.itemH);
 
       }
 
