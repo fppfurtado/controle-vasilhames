@@ -10,21 +10,17 @@ const inventario = {
 function carregarInventario(data) {
 
     console.log("[VERIFICAR INVENTARIO]");
-console.log("data: "+data);
+
     // consulta se já existe o inventário do dia
     firebase.firestore().collection("inventarios")
     .where("data", "==", data)
     .get()
     .then((querySnapshot) => {
-        console.log("querySnapshot");
-        console.log(querySnapshot);
+        
         // se não existir...
         if(querySnapshot.empty) {
-
-            console.log("querySnapshot vazia");
-            console.log("data: " + data);
+            //console.log("inventario do dia não existe");
             //inventario.data = firebase.firestore.Timestamp.fromDate(new Date());
-            console.log("inventario: "+inventario);
             inventario.data = data;
             
             // carrega o inventario do dia anterior...
@@ -39,21 +35,20 @@ console.log("data: "+data);
 
                         let invent = doc.data();
 
-                        console.log(doc);
-
-                        console.log("invent:");
-                        console.log(invent);
-
+                        //console.log(doc);
                         // copia os quantitativos do dia anterior para o inventario atual
 
                         inventario.qtdVasilhamesCheiosDiaAnterior = 
-                            invent.qtdVasilhamesCheiosDiaAnterior + invent.qtdVasilhamesCheiosDiaAtual;
+                            eval(invent.qtdVasilhamesCheiosDiaAnterior) 
+                            + eval(invent.qtdVasilhamesCheiosDiaAtual);
                         
                         inventario.qtdVasilhamesVaziosDiaAnterior = 
-                            invent.qtdVasilhamesVaziosDiaAnterior + invent.qtdVasilhamesVaziosDiaAtual;
+                            eval(invent.qtdVasilhamesVaziosDiaAnterior) 
+                            + eval(invent.qtdVasilhamesVaziosDiaAtual);
 
                         inventario.qtdVasilhamesInutizadosDiaAnterior = 
-                            invent.qtdVasilhamesInutizadosDiaAnterior + invent.qtdVasilhamesInutizadosDiaAnterior;
+                            eval(invent.qtdVasilhamesInutizadosDiaAnterior) 
+                            + eval(invent.qtdVasilhamesInutizadosDiaAnterior);
 
                         //criarDocumento("inventarios", inventario);
 
@@ -65,19 +60,19 @@ console.log("data: "+data);
                 console.log("Error on getting inventarios: " + error);
             })
 
-            criarDocumento("inventarios", inventario);
-
+            criarDocumento("inventarios", inventario)
+            .then((docId) => {
+                //console.log(docId);
+                inventario.id = docId;
+            });
+            
         } else {
-
+            //console.log("inventario do dia já existe");
             querySnapshot.forEach((doc) => {
 
                 let invent = doc.data();
 
-                console.log(doc);
-                console.log(invent);
-
-                //return invent;
-
+                inventario.id = doc.id;
                 inventario.data = invent.data;
                 inventario.qtdVasilhamesCheiosDiaAnterior = invent.qtdVasilhamesCheiosDiaAnterior;
                 inventario.qtdVasilhamesCheiosDiaAtual = invent.qtdVasilhamesCheiosDiaAtual;
@@ -88,7 +83,8 @@ console.log("data: "+data);
 
             })
 
-            console.log("inventario: " + inventario);
+            // console.log("inventario:");
+            // console.log(inventario);
 
         }
 
@@ -102,48 +98,51 @@ console.log("data: "+data);
 function criarDocumento(colecao, documento) {
 
     console.log("[CRIAR DOCUMENTO]");
+    
+    return new Promise((resolve, reject) => {
+        
+        if(!!documento.id) {
 
-    if(!!documento.id) {
+            firebase.firestore().collection(colecao).doc(documento.id)
+                .get()
+                .then((documentSnapshot) => {
 
-        firebase.firestore().collection(colecao).doc(documento.id)
-            .get()
-            .then((documentSnapshot) => {
+                    if(!documentSnapshot.exist) {
+                    firebase.firestore().collection(colecao).doc(documento.id).set(documento)
+                        .then((docRef) => {            
+                            resolve(documento.id);
+                        })
+                        .catch((error) => {
+                            //console.error("Error adding document: ", error);
+                            reject(error);
+                        });
 
-                if(!documentSnapshot.exist) {
-                firebase.firestore().collection(colecao).doc(documento.id).set(documento)
-                    .then((docRef) => {
-                        return docRef;
-                        console.log("Document written with ID: ", documento.id);
-                    })
-                    .catch((error) => {
-                        console.error("Error adding document: ", error);
-                    });
+                    } else {
+                        alert("Registro já cadastrado: " + documentSnapshot);
+                    }
+                    
+                })
+                .catch((error) => {
+                    //console.log("Error getting documents: ", error);
+                    reject(error)
+                });
 
-                } else {
-                    alert("Registro já cadastrado: " + documentSnapshot);
+        } else {
 
-                }
-                
+            firebase.firestore().collection(colecao).add(documento)
+            .then((docRef) => {
+                //console.log("documento registrado: "+docRef.id);
+                resolve(docRef.id);
             })
             .catch((error) => {
+                //console.log("erro no registro do documento: "+error);
+                reject(error);
+            })
 
-                console.log("Error getting documents: ", error);
-                
-            });
+        }        
 
-    } else {
+    })
 
-        firebase.firestore().collection(colecao).add(documento)
-        .then((docRef) => {
-            console.log("documento registrado: "+docRef.id);
-            return docRef;
-        })
-        .catch((error) => {
-            console.log("erro no registro do documento: "+error);
-        })
-
-    }
-    
 }
 
 function carregarDocumentos(colecao, id = null) {
@@ -189,10 +188,10 @@ function atualizarDocumento(colecao, documento, id) {
     console.log("atualizando documento: "+ id);
     firebase.firestore().collection(colecao).doc(id).set(documento)
             .then((docRef) => {
-                console.log("Document written with ID: ", docRef);
+                console.log("Documento atualizado");
             })
             .catch((error) => {
-                console.error("Error adding document: ", error);
+                console.error("Error adding document: " + error);
             });
 
 }
@@ -266,9 +265,13 @@ function getUrlParameter(sParam) {
 
 function atualizarInventario(qtdVasilhamesCheiosDiaAtual, qtdVasilhamesVaziosDiaAtual, qtdVasilhamesInutizadosDiaAtual) {
 
-    inventario.qtdVasilhamesCheiosDiaAtual += qtdVasilhamesCheiosDiaAtual;
-    inventario.qtdVasilhamesVaziosDiaAtual += qtdVasilhamesVaziosDiaAtual;
-    inventario.qtdVasilhamesInutizadosDiaAtual += qtdVasilhamesInutizadosDiaAtual;
+    console.log("[ATUALIZAR INVENTARIO]")
+
+    console.log(inventario);
+
+    inventario.qtdVasilhamesCheiosDiaAtual += eval(qtdVasilhamesCheiosDiaAtual);
+    inventario.qtdVasilhamesVaziosDiaAtual += eval(qtdVasilhamesVaziosDiaAtual);
+    inventario.qtdVasilhamesInutizadosDiaAtual += eval(qtdVasilhamesInutizadosDiaAtual);
     
     atualizarDocumento("inventarios", inventario, inventario.id);
 
