@@ -4,7 +4,8 @@ const inventario = {
     qtdVasilhamesInutizadosDiaAnterior: 0,
     qtdVasilhamesCheiosDiaAtual: 0,
     qtdVasilhamesVaziosDiaAtual: 0,
-    qtdVasilhamesInutizadosDiaAtual: 0
+    qtdVasilhamesInutizadosDiaAtual: 0,
+    movimentos: []
 };
 
 function carregarInventario(data) {
@@ -67,9 +68,9 @@ function carregarInventario(data) {
             });
             
         } else {
-            //console.log("inventario do dia já existe");
+            console.log("inventario do dia já existe");
             querySnapshot.forEach((doc) => {
-
+                console.log(doc);
                 let invent = doc.data();
 
                 inventario.id = doc.id;
@@ -95,43 +96,27 @@ function carregarInventario(data) {
 
 }
 
-function criarDocumento(colecao, documento) {
+function criarDocumento(colecao, documento, id = null) {
 
     console.log("[CRIAR DOCUMENTO]");
+
+    console.log(documento);
     
     return new Promise((resolve, reject) => {
-        
-        if(!!documento.id) {
 
-            firebase.firestore().collection(colecao).doc(documento.id)
-                .get()
-                .then((documentSnapshot) => {
+        if(!!id) {
 
-                    if(!documentSnapshot.exist) {
-                    firebase.firestore().collection(colecao).doc(documento.id).set(documento)
-                        .then((docRef) => {            
-                            resolve(documento.id);
-                        })
-                        .catch((error) => {
-                            //console.error("Error adding document: ", error);
-                            reject(error);
-                        });
-
-                    } else {
-                        alert("Registro já cadastrado: " + documentSnapshot);
-                    }
-                    
-                })
-                .catch((error) => {
-                    //console.log("Error getting documents: ", error);
-                    reject(error)
-                });
+            atualizarDocumento(colecao, documento, id)
+            .then((docRef) => {
+                console.log("documento com id previo: "+docRef);
+                resolve(docRef);
+            });
 
         } else {
 
             firebase.firestore().collection(colecao).add(documento)
             .then((docRef) => {
-                //console.log("documento registrado: "+docRef.id);
+                console.log("documento sem id previo: "+docRef.id);
                 resolve(docRef.id);
             })
             .catch((error) => {
@@ -139,8 +124,8 @@ function criarDocumento(colecao, documento) {
                 reject(error);
             })
 
-        }        
-
+        }
+         
     })
 
 }
@@ -185,14 +170,23 @@ function atualizarDocumento(colecao, documento, id) {
 
     console.log("[ATUALIZAR DOCUMENTO]");
 
-    console.log("atualizando documento: "+ id);
-    firebase.firestore().collection(colecao).doc(id).set(documento)
-            .then((docRef) => {
-                console.log("Documento atualizado");
-            })
-            .catch((error) => {
-                console.error("Error adding document: " + error);
-            });
+    delete documento.id;
+
+    console.log(documento);
+    
+    return new Promise((resolve, reject) => {
+        
+        firebase.firestore().collection(colecao).doc(id).set(documento)
+        .then(() => {
+            console.log("Documento atualizado: "+id);
+            resolve(id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: " + error);
+            reject(error);
+        });
+
+    })
 
 }
 
@@ -218,8 +212,8 @@ function formatarData(data, formato = "br") {
     let ano = dataJS.getFullYear();
     let mes = String(dataJS.getMonth()+1).padStart(2, "0");
     let dia = String(dataJS.getDate()).padStart(2, "0");
-    let horas = dataJS.getHours();
-    let minutos = dataJS.getMinutes();
+    let horas = String(dataJS.getHours()).padStart(2, "0");
+    let minutos = String(dataJS.getMinutes()).padStart(2, "0");
     //let mes = formatarZeroAEsquerda(dataJS.getMonth()+1);
     
     let dataFormatada = formato == "br" ? 
@@ -263,16 +257,42 @@ function getUrlParameter(sParam) {
     return false;
 }
 
-function atualizarInventario(qtdVasilhamesCheiosDiaAtual, qtdVasilhamesVaziosDiaAtual, qtdVasilhamesInutizadosDiaAtual) {
+function atualizarInventario(inventario, movimento) {
 
     console.log("[ATUALIZAR INVENTARIO]")
 
     console.log(inventario);
+    console.log(movimento);
 
-    inventario.qtdVasilhamesCheiosDiaAtual += eval(qtdVasilhamesCheiosDiaAtual);
-    inventario.qtdVasilhamesVaziosDiaAtual += eval(qtdVasilhamesVaziosDiaAtual);
-    inventario.qtdVasilhamesInutizadosDiaAtual += eval(qtdVasilhamesInutizadosDiaAtual);
+    inventario.movimentos.push("movimentos/" + movimento.id);
+
+    switch (movimento.situacaoVasilhame) {
+        case "c":
+            
+            inventario.qtdVasilhamesCheiosDiaAtual += eval(movimento.qtdVasilhames);
+            break;
+
+        case "v":
+            inventario.qtdVasilhamesVaziosDiaAtual += eval(movimento.qtdVasilhames);    
+            break;
+
+        case "i":
+            inventario.qtdVasilhamesInutizadosDiaAtual += eval(movimento.qtdVasilhames);
+            break;
     
-    atualizarDocumento("inventarios", inventario, inventario.id);
+    }
+
+    let id = inventario.id;
+    
+    atualizarDocumento("inventarios", inventario, id);
+
+}
+
+function habilitarMonitoramentoDocumento(colecao, id, listener) {
+
+    console.log("[HABILITAR MONITORAMENTO DOCUMENTO]");
+
+    //firebase.firestore().collection(colecao).doc(id).onSnapshot(listener);
+    firebase.firestore().collection(colecao).where("id", "==", id).onSnapshot(listener);
 
 }

@@ -90,23 +90,34 @@
 
         if(!!id) {
 
-          romaneio.id = id;
-          atualizarDocumento("romaneios", romaneio);
+          //romaneio.id = id;
+          atualizarDocumento("romaneios", romaneio, id);
 
         } else {
 
-          romaneio.id = gerarIdRomaneio();
+          id = gerarIdRomaneio();
           criarDocumento("romaneios", romaneio);
+          habilitarMonitoramentoDocumento("romaneios", id, (snapshot) => {
+            console.log("ouvindo alteração romaneio...");
+            // snapshot.docChanges().forEach((change) => {
+            //   console.log("change:");
+            //   console.log(change);
+
+            // });
+          })
 
         }
 
-        registrarMovimento(romaneio.id, "e");
+        registrarMovimento(id, "e");
 
       }
 
       function carregarRomaneio() {
 
-        //console.log("id: "+id);
+        console.log("[CARREGAR ROMANEIO]");
+
+        console.log("id: "+id);
+        
         carregarDocumentos("romaneios", id)
           .then((documentSnapshot) => {
 
@@ -161,31 +172,62 @@
 
         let movimento = {
           data: romaneio.data,
-          origem: romaneioId,
+          origem: "romaneios/" + romaneioId,
           destino: romaneio.placa
+
         }
 
         if(tipoMovimento == "e") {
 
           // vasilhames cheios
           if(romaneio.itemI) {
+
             movimento.situacaoVasilhame = "c";
             movimento.qtdVasilhames = romaneio.itemI;
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              movimento.id = docRef;
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
+
           }
 
           // vasilhames vazios
           if(romaneio.itemB) {            
             movimento.situacaoVasilhame = "v";
             movimento.qtdVasilhames = romaneio.itemB;
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
           }
 
           // vasilhames inutilizados (quebrados ou vencidos)
           if(romaneio.itemH) {            
             movimento.situacaoVasilhame = "i";
             movimento.qtdVasilhames = romaneio.itemH;
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
           }
 
         } else {
@@ -194,27 +236,51 @@
           if(romaneio.itemI) {
             movimento.situacaoVasilhame = "c";
             movimento.qtdVasilhames = -(romaneio.itemI);
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
           }
 
           // vasilhames vazios
           if(romaneio.itemB) {            
             movimento.situacaoVasilhame = "v";
             movimento.qtdVasilhames = -(romaneio.itemB);
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
           }
 
           // vasilhames inutilizados (quebrados ou vencidos)
           if(romaneio.itemH) {            
             movimento.situacaoVasilhame = "i";
             movimento.qtdVasilhames = -(romaneio.itemH);
-            criarDocumento("movimentos", movimento);
+            criarDocumento("movimentos", movimento)
+            .then((docRef) => {
+              console.log("id movimento: "+docRef);
+              habilitarMonitoramentoDocumento("movimentos", docRef, function() {
+                console.log("listener movimento executnado");
+                atualizarInventario(inventario, movimento);
+              });  
+            })
+            
+            //atualizarInventario(inventario, movimento);
           }
 
         }
-
-        
-        atualizarInventario(romaneio.itemI, romaneio.itemB, romaneio.itemH);
 
       }
 
