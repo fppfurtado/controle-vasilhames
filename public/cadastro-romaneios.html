@@ -58,8 +58,8 @@
         data: null,
         placa: null,
         quantidades: new Array(5),
-        alterarQuantidade: function(situacaoVasilhame, qtd) {
-            this.quantidades[situacaoVasilhame] = qtd;
+        alterarQuantidade: function(estadoVasilhame, qtd) {
+          this.quantidades[estadoVasilhame] = qtd;
         }
       }
 
@@ -84,11 +84,11 @@
         romaneio.id = id;
         romaneio.data = new Date(document.getElementById("data").value);
         romaneio.placa = document.getElementById("placa").value;
-        romaneio.alterarQuantidade(situacaoVasilhames.BOM_PARA_ENVASE, document.getElementById("itemA").value);
-        romaneio.alterarQuantidade(situacaoVasilhames.RETORNO_VAZIO, document.getElementById("itemB").value);
-        romaneio.alterarQuantidade(situacaoVasilhames.ENTRADA_CHEIO, document.getElementById("itemC").value);
-        romaneio.alterarQuantidade(situacaoVasilhames.TROCA_PERDA, document.getElementById("itemH").value);
-        romaneio.alterarQuantidade(situacaoVasilhames.CHEIO_A_FATURAR, document.getElementById("itemI").value);
+        romaneio.alterarQuantidade(SituacoesRomaneio.BOM_PARA_ENVASE, document.getElementById("itemA").value);
+        romaneio.alterarQuantidade(SituacoesRomaneio.RETORNO_VAZIO, document.getElementById("itemB").value);
+        romaneio.alterarQuantidade(SituacoesRomaneio.ENTRADA_CHEIO, document.getElementById("itemC").value);
+        romaneio.alterarQuantidade(SituacoesRomaneio.TROCA_PERDA, document.getElementById("itemH").value);
+        romaneio.alterarQuantidade(SituacoesRomaneio.CHEIO_A_FATURAR, document.getElementById("itemI").value);
 
         delete romaneio.alterarQuantidade;
 
@@ -96,34 +96,21 @@
 
         if(!!id) {
 
-          //romaneio.id = id;
-          atualizarDocumento("romaneios", romaneio, id)
-          .then((docId) => {
+          atualizarDocumento("romaneios", romaneio, id);
 
-            registrarMovimento(romaneio);
-
-          })
-     
         } else {
-
-          //romaneio.id = gerarIdRomaneio();
-          //romaneio.id = id;
 
           criarDocumento("romaneios", romaneio, gerarIdRomaneio())
           .then((docRef) => {
 
             habilitarMonitoramentoDocumento("romaneios", id, (snapshot) => {
               console.log("ouvindo alteração romaneio...");
+              registrarMovimento(romaneio);
             })
-
-            registrarMovimento(romaneio);
 
           })
           
         }
-
-        //registrarMovimento(id, tipoMovimento.ENTRADA);
-        
 
       }
 
@@ -190,38 +177,76 @@
 
         console.log(romaneio);
 
-        romaneio.quantidades.forEach((value, index, array) => {
+        // percorrendo todos os estados de vasilhame possíveis (cheio, vazio e inutilizado)
+        for(const estadoVasilhame in EstadosVasilhame) {
 
-          if(!!value) {
+          let estado = EstadosVasilhame[estadoVasilhame];
 
-            let movimento = {
-              data: romaneio.data, 
-              origem: "romaneios/" + romaneio.id,
-              destino: romaneio.placa,
-              situacaoVasilhame: index,
-              quantidade: value  
-            }
+          console.log("percorrendo os estados de vasilhame: "+estadoVasilhame+" - "+estado);          
 
-            console.log("movimento:");
-            console.log(movimento);
+          // consultando todos os movimentos gerados pelo romaneio
+          firebase.firestore().collection("movimentos")
+            .where("origem", "==", "romaneios/" + romaneio.id)
+            .where("estadoVasilhame", "==", estado)
+            .get()
+            .then((querySnapshot) => {
 
+              if(querySnapshot.docs.length) {
 
-            criarDocumento("movimentos", movimento)
-            .then((docRef) => {
+                console.log("movimento do estado " + estadoVasilhame + " encontrado!");
 
-                movimento.id = docRef;
+                querySnapshot.forEach((doc) => {
 
-                habilitarMonitoramentoDocumento("movimentos", docRef, function() {
-                  console.log("listener movimento executando");
-                  atualizarInventario(inventario, movimento);
-                });  
-                
+                  let movimento = doc.data();
+                  movimento.quantidade = romaneio.quantidades[estado];
+
+                  console.log(movimento);
+
+                  atualizarDocumento("movimentos", movimento);
+
+                })
+
+              } else {
+
+                console.log("movimento do estado " + estadoVasilhame + " não encontrado!");
+                console.log(romaneio);
+                console.log(romaneio.quantidades);
+                console.log(estadoVasilhame);
+                console.log(romaneio.quantidades[estado]);
+
+                if(!!romaneio.quantidades[estado]) {
+
+                  console.log("romaneio: " + romaneio.quantidades[estado] + " vasilhames tipo " + estadoVasilhame + "encontrados!");
+
+                  let movimento = {
+                      data: romaneio.data, 
+                      origem: "romaneios/" + romaneio.id,
+                      destino: romaneio.placa,
+                      estadoVasilhame: estado,
+                      quantidade: romaneio.quantidades[estado]
+                    };
+
+                  criarDocumento("movimentos", movimento)
+                  .then((docId) => {
+
+                    habilitarMonitoramentoDocumento("movimentos", docId, function() {
+                      console.log("listener movimento executando");
+                      atualizarInventario(inventario, movimento);
+                    });
+
+                  })
+                  .catch((error) => {
+                    console.log("Erro ao criar movimento: "+ error);
+                  })
+
+                }
+              
+              }
+            
             })
+          
+        }
 
-          }
-
-        })
-      
       }
 
     </script>

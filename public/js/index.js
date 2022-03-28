@@ -1,9 +1,15 @@
-const situacaoVasilhames = {
+const SituacoesRomaneio = {
     "BOM_PARA_ENVASE": 0,
     "RETORNO_VAZIO": 1,
     "ENTRADA_CHEIO": 2,
     "TROCA_PERDA": 3,
     "CHEIO_A_FATURAR": 4
+}
+
+const EstadosVasilhame = {
+    "CHEIO": SituacoesRomaneio.CHEIO_A_FATURAR,
+    "VAZIO": SituacoesRomaneio.RETORNO_VAZIO,
+    "INUTILIZADO": SituacoesRomaneio.TROCA_PERDA
 }
 
   const tipoMovimento = {
@@ -147,10 +153,9 @@ function atualizarDocumento(colecao, documento, id) {
 
     console.log("[ATUALIZAR DOCUMENTO]");
 
-    delete documento.id;
-
     console.log(documento);
-    console.log(id);
+
+    delete documento.id;
     
     return new Promise((resolve, reject) => {
         
@@ -277,17 +282,17 @@ function atualizarInventario(inventario, movimento) {
 
     inventario.movimentos.push("movimentos/" + movimento.id);
 
-    switch (movimento.situacaoVasilhame) {
-        case situacaoVasilhames.CHEIO_A_FATURAR:
+    switch (movimento.estadoVasilhame) {
+        case SituacoesRomaneio.CHEIO_A_FATURAR:
             
             inventario.qtdVasilhamesCheiosDiaAtual += eval(movimento.quantidade);
             break;
 
-        case situacaoVasilhames.RETORNO_VAZIO:
+        case SituacoesRomaneio.RETORNO_VAZIO:
             inventario.qtdVasilhamesVaziosDiaAtual += eval(movimento.quantidade);    
             break;
 
-        case situacaoVasilhames.TROCA_PERDA:
+        case SituacoesRomaneio.TROCA_PERDA:
             inventario.qtdVasilhamesInutizadosDiaAtual += eval(movimento.quantidade);
             break;
     
