@@ -1,3 +1,16 @@
+const situacaoVasilhames = {
+    "BOM_PARA_ENVASE": 0,
+    "RETORNO_VAZIO": 1,
+    "ENTRADA_CHEIO": 2,
+    "TROCA_PERDA": 3,
+    "CHEIO_A_FATURAR": 4
+}
+
+  const tipoMovimento = {
+    ENTRADA: "e",
+    SAIDA: "s"
+};
+
 const inventario = {
     qtdVasilhamesCheiosDiaAnterior: 0,
     qtdVasilhamesVaziosDiaAnterior: 0,
@@ -130,6 +143,31 @@ function criarDocumento(colecao, documento, id = null) {
 
 }
 
+function atualizarDocumento(colecao, documento, id) {
+
+    console.log("[ATUALIZAR DOCUMENTO]");
+
+    delete documento.id;
+
+    console.log(documento);
+    console.log(id);
+    
+    return new Promise((resolve, reject) => {
+        
+        firebase.firestore().collection(colecao).doc(id).set(documento)
+        .then(() => {
+            documento.id = id;
+            resolve(id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: " + error);
+            reject(error);
+        });
+
+    })
+
+}
+
 function carregarDocumentos(colecao, id = null) {
 
     console.log("[CARREGAR DOCUMENTOS]");
@@ -163,30 +201,6 @@ function carregarDocumentos(colecao, id = null) {
         }
 
     });
-
-}
-
-function atualizarDocumento(colecao, documento, id) {
-
-    console.log("[ATUALIZAR DOCUMENTO]");
-
-    delete documento.id;
-
-    console.log(documento);
-    
-    return new Promise((resolve, reject) => {
-        
-        firebase.firestore().collection(colecao).doc(id).set(documento)
-        .then(() => {
-            console.log("Documento atualizado: "+id);
-            resolve(id);
-        })
-        .catch((error) => {
-            console.error("Error adding document: " + error);
-            reject(error);
-        });
-
-    })
 
 }
 
@@ -261,26 +275,26 @@ function atualizarInventario(inventario, movimento) {
 
     console.log("[ATUALIZAR INVENTARIO]")
 
-    console.log(inventario);
-    console.log(movimento);
-
     inventario.movimentos.push("movimentos/" + movimento.id);
 
     switch (movimento.situacaoVasilhame) {
-        case "c":
+        case situacaoVasilhames.CHEIO_A_FATURAR:
             
-            inventario.qtdVasilhamesCheiosDiaAtual += eval(movimento.qtdVasilhames);
+            inventario.qtdVasilhamesCheiosDiaAtual += eval(movimento.quantidade);
             break;
 
-        case "v":
-            inventario.qtdVasilhamesVaziosDiaAtual += eval(movimento.qtdVasilhames);    
+        case situacaoVasilhames.RETORNO_VAZIO:
+            inventario.qtdVasilhamesVaziosDiaAtual += eval(movimento.quantidade);    
             break;
 
-        case "i":
-            inventario.qtdVasilhamesInutizadosDiaAtual += eval(movimento.qtdVasilhames);
+        case situacaoVasilhames.TROCA_PERDA:
+            inventario.qtdVasilhamesInutizadosDiaAtual += eval(movimento.quantidade);
             break;
     
     }
+
+    console.log(inventario);
+    console.log(movimento);
 
     let id = inventario.id;
     

@@ -58,11 +58,11 @@
                     
                     celData.innerHTML = formatarData(romaneio.data);
                     celPlaca.innerHTML = romaneio.placa;
-                    celItemA.innerHTML = romaneio.itemA;
-                    celItemB.innerHTML = romaneio.itemB;
-                    celItemC.innerHTML = romaneio.itemC;
-                    celItemH.innerHTML = romaneio.itemH;
-                    celItemI.innerHTML = romaneio.itemI;
+                    celItemA.innerHTML = romaneio.quantidades[0];
+                    celItemB.innerHTML = romaneio.quantidades[1];
+                    celItemC.innerHTML = romaneio.quantidades[2];
+                    celItemH.innerHTML = romaneio.quantidades[3];
+                    celItemI.innerHTML = romaneio.quantidades[4];
                     
                     linkEditar.setAttribute("href", "cadastro-romaneios.html?id=" + doc.id);
                     linkEditar.textContent = "editar";
