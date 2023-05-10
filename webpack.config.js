@@ -9,6 +9,7 @@ module.exports = {
     clean: true
   },
   plugins: [new HtmlWebpackPlugin({
-    template: 'src/index.html'
+    template: 'src/index.html',
+    hash: true
   })]
 };
