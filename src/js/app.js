@@ -1,3 +1,5 @@
+import 'bootstrap/dist/css/bootstrap.css'
+
 const SituacoesRomaneio = {
     "BOM_PARA_ENVASE": 0,
     "RETORNO_VAZIO": 1,
